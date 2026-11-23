@@ -1,0 +1,10 @@
+{
+ "model": "matern32",
+ "sill": 3.5,
+ "range": 22.0,
+ "nugget": 0.5,
+ "trend": {
+  "intercept": 8.0,
+  "elev": 0.06
+ }
+}

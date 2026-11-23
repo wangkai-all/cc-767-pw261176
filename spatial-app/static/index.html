@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>空间数据分析 · 泛克里金插值</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header>
+  <h1>空间数据分析</h1>
+  <span class="sub">带趋势项的泛克里金 · 空间块交叉验证 · 屏障阻断 · 自适应加点</span>
+  <span id="version-badges"></span>
+</header>
+<main>
+  <section id="map-panel">
+    <div id="toolbar">
+      <span class="group">
+        图层：
+        <label><input type="radio" name="layer" value="mean" checked> 预测均值</label>
+        <label><input type="radio" name="layer" value="sd"> 误差(标准差)</label>
+      </span>
+      <span class="group">
+        操作：
+        <label><input type="radio" name="mode" value="inspect" checked> 点选格查权重</label>
+        <label><input type="radio" name="mode" value="draw"> 画验证块</label>
+      </span>
+      <span class="group" id="legend"></span>
+    </div>
+    <div id="canvas-wrap">
+      <canvas id="map" width="760" height="700"></canvas>
+      <div id="tooltip" hidden></div>
+    </div>
+    <div id="colorbar-row"><canvas id="colorbar" width="300" height="18"></canvas>
+      <span id="colorbar-min"></span><span id="colorbar-max"></span>
+      <span id="colorbar-label"></span>
+    </div>
+    <details id="weights-panel" class="panel">
+      <summary>邻点权重（点击栅格后显示）</summary>
+      <div id="weights-body">尚未选择预测格。</div>
+    </details>
+    <details id="data-table" class="panel">
+      <summary>数据表（全部测点）</summary>
+      <div id="data-table-body"></div>
+    </details>
+  </section>
+
+  <aside id="sidebar">
+    <section class="panel">
+      <h2>模型设置</h2>
+      <label>相关模型
+        <select id="cfg-model">
+          <option value="exponential">指数型</option>
+          <option value="gaussian">高斯型</option>
+          <option value="matern32" selected>Matérn-3/2</option>
+          <option value="spherical">球状</option>
+        </select>
+      </label>
+      <label><input type="checkbox" id="cfg-xytrend" checked> 坐标线性趋势</label>
+      <label><input type="checkbox" id="cfg-covtrend" checked> 地形协变量趋势</label>
+      <label><input type="checkbox" id="cfg-barriers" checked> 屏障阻断相关</label>
+      <label>近重合点
+        <select id="cfg-near">
+          <option value="merge" selected>合并测点</option>
+          <option value="jitter">加噪稳定(微扰)</option>
+        </select>
+      </label>
+      <div class="btn-row">
+        <button id="btn-fit">拟合</button>
+        <button id="btn-predict">预测栅格</button>
+      </div>
+      <div id="params-out" class="mono"></div>
+    </section>
+
+    <section class="panel">
+      <h2>预处理报告</h2>
+      <div id="preprocess-out">（拟合后显示重复点合并 / 加噪稳定等改动）</div>
+    </section>
+
+    <section class="panel">
+      <h2>交叉验证（连续空间块）</h2>
+      <label>方式
+        <select id="cv-scheme">
+          <option value="block" selected>空间块（推荐）</option>
+          <option value="random">随机拆分（对照，高估精度）</option>
+        </select>
+      </label>
+      <label>折数 <input type="number" id="cv-folds" value="5" min="2" max="10"></label>
+      <div class="btn-row">
+        <button id="btn-cv">运行验证</button>
+        <button id="btn-cv-drawn" title="先在图上用「画验证块」画矩形">用画的块验证</button>
+        <button id="btn-clear-rects">清除块</button>
+      </div>
+      <div id="cv-out"></div>
+    </section>
+
+    <section class="panel">
+      <h2>加点建议</h2>
+      <label>个数 <input type="number" id="sg-n" value="4" min="1" max="10"></label>
+      <label>基础费用 <input type="number" id="sg-base" value="1.0" step="0.5" min="0"></label>
+      <label>行进费/单位距离 <input type="number" id="sg-travel" value="0.02" step="0.01" min="0"></label>
+      <div class="btn-row"><button id="btn-suggest">生成建议</button></div>
+      <div id="suggest-out"></div>
+    </section>
+
+    <section class="panel">
+      <h2>版本</h2>
+      <div id="versions-out"></div>
+    </section>
+
+    <section class="panel">
+      <h2>数据导入</h2>
+      <input type="file" id="file-upload" accept=".csv">
+      <div class="hint">CSV 列：id,x,y,value,batch,协变量…</div>
+    </section>
+  </aside>
+</main>
+<script src="/static/app.js"></script>
+</body>
+</html>
